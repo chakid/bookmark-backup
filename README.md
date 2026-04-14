@@ -9,6 +9,12 @@
 - 可判断新旧：保存版本元数据，识别谁新谁旧
 - 可检测冲突：本地和远端同时变化时不直接覆盖
 
+![alt text](image.png)
+
+![alt text](image-1.png)
+
+![alt text](image-2.png)
+
 ## 当前进度
 
 目前已经完成的能力：
@@ -273,4 +279,3 @@ npm test
 4. 增加导出/导入扩展配置
 5. 增加更细粒度的冲突对比视图
 6. 评估 GitHub OAuth 替代手动 Token
-
