@@ -1,0 +1,253 @@
+:root {
+  color-scheme: light;
+  --bg: #f5efe4;
+  --panel: rgba(255, 252, 246, 0.92);
+  --line: rgba(33, 29, 20, 0.14);
+  --text: #201d16;
+  --muted: #6f6656;
+  --accent: #0f766e;
+  --danger: #b42318;
+  --shadow: 0 24px 60px rgba(58, 47, 27, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Segoe UI", "PingFang SC", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(15, 118, 110, 0.18), transparent 32%),
+    radial-gradient(circle at top right, rgba(187, 35, 24, 0.12), transparent 28%),
+    linear-gradient(180deg, #f9f4ea 0%, var(--bg) 100%);
+}
+
+.page {
+  width: min(960px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 48px 0 64px;
+}
+
+.hero {
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(32px, 6vw, 48px);
+  line-height: 1.04;
+}
+
+.lead {
+  max-width: 720px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(16px);
+}
+
+.panel + .panel {
+  margin-top: 20px;
+}
+
+.panel h2 {
+  margin-top: 0;
+}
+
+.form {
+  display: grid;
+  gap: 16px;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+}
+
+label span,
+small {
+  color: var(--muted);
+}
+
+input,
+select,
+button {
+  font: inherit;
+}
+
+input,
+select {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--text);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+.checkbox {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkbox input {
+  width: 18px;
+  height: 18px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+button {
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 18px;
+  cursor: pointer;
+  background: var(--accent);
+  color: white;
+  transition: transform 120ms ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button.secondary {
+  background: white;
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+
+.status-grid {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.status-grid div {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.status-grid dt {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.status-grid dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.message {
+  margin-bottom: 0;
+  min-height: 24px;
+}
+
+.search-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+}
+
+.search-results {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.search-item {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition:
+    transform 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease,
+    background-color 120ms ease;
+}
+
+.search-item:hover {
+  transform: translateY(-1px);
+  border-color: rgba(15, 118, 110, 0.35);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 12px 24px rgba(58, 47, 27, 0.08);
+}
+
+.search-item:focus-within {
+  border-color: rgba(15, 118, 110, 0.45);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+}
+
+.search-item h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.search-item p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  word-break: break-all;
+}
+
+.search-empty {
+  color: var(--muted);
+}
+
+.conflict-detail {
+  white-space: pre-wrap;
+  border-radius: 16px;
+  background: #fff8f6;
+  border: 1px solid rgba(180, 35, 24, 0.16);
+  padding: 16px;
+  color: var(--danger);
+}
+
+@media (max-width: 640px) {
+  .page {
+    width: min(100vw - 20px, 960px);
+    padding-top: 24px;
+  }
+
+  .panel {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .search-row {
+    grid-template-columns: 1fr;
+  }
+}

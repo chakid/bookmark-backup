@@ -1,0 +1,196 @@
+:root {
+  --bookmark-overlay-bg: rgba(14, 12, 10, 0.42);
+  --bookmark-overlay-shell: rgba(252, 249, 243, 0.94);
+  --bookmark-overlay-line: rgba(30, 22, 17, 0.12);
+  --bookmark-overlay-ink: #18120e;
+  --bookmark-overlay-muted: #72675e;
+  --bookmark-overlay-accent: #c2521f;
+  --bookmark-overlay-accent-deep: #8d3413;
+  --bookmark-overlay-panel: rgba(255, 255, 255, 0.75);
+  --bookmark-overlay-shadow: 0 40px 90px rgba(33, 19, 9, 0.28);
+}
+
+#bookmark-quick-search-root {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  pointer-events: none;
+  font-family: Georgia, "Noto Serif SC", "Songti SC", serif;
+}
+
+#bookmark-quick-search-root.visible {
+  pointer-events: auto;
+}
+
+.bookmark-search-backdrop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top left, rgba(194, 82, 31, 0.16), transparent 25%),
+    radial-gradient(circle at top right, rgba(15, 118, 110, 0.16), transparent 22%),
+    var(--bookmark-overlay-bg);
+  backdrop-filter: blur(14px);
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+#bookmark-quick-search-root.visible .bookmark-search-backdrop {
+  opacity: 1;
+}
+
+.bookmark-search-modal {
+  position: absolute;
+  left: 50%;
+  top: 16vh;
+  width: min(860px, calc(100vw - 56px));
+  max-height: min(72vh, 760px);
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  transform: translate(-50%, 24px) scale(0.98);
+  opacity: 0;
+  border: 1px solid var(--bookmark-overlay-line);
+  border-radius: 30px;
+  overflow: hidden;
+  background: var(--bookmark-overlay-shell);
+  box-shadow: var(--bookmark-overlay-shadow);
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+#bookmark-quick-search-root.visible .bookmark-search-modal {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+
+.bookmark-search-topbar {
+  padding: 20px 22px 16px;
+  background:
+    radial-gradient(circle at right top, rgba(194, 82, 31, 0.12), transparent 30%),
+    linear-gradient(180deg, rgba(255, 249, 240, 0.96), rgba(249, 243, 235, 0.92));
+}
+
+.bookmark-search-kicker {
+  margin: 0 0 8px;
+  font: 700 11px/1.2 "Segoe UI", sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--bookmark-overlay-accent);
+}
+
+.bookmark-search-title {
+  margin: 0;
+  color: var(--bookmark-overlay-ink);
+  font-size: 36px;
+  line-height: 0.96;
+}
+
+.bookmark-search-inputbar {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 12px;
+  margin: 14px 22px 0;
+  border: 1px solid var(--bookmark-overlay-line);
+  border-radius: 18px;
+  background: var(--bookmark-overlay-panel);
+  padding: 12px 16px;
+}
+
+.bookmark-search-glyph {
+  width: 40px;
+  height: 40px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 12px;
+  color: white;
+  background: linear-gradient(135deg, var(--bookmark-overlay-accent), var(--bookmark-overlay-accent-deep));
+  font: 700 18px/1 "Segoe UI", sans-serif;
+}
+
+.bookmark-search-input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  outline: none;
+  color: var(--bookmark-overlay-ink);
+  font: 500 28px/1.15 Georgia, "Noto Serif SC", "Songti SC", serif;
+}
+
+.bookmark-search-input::placeholder {
+  color: #a2978d;
+}
+
+.bookmark-search-hint {
+  padding: 12px 22px 14px;
+  color: var(--bookmark-overlay-muted);
+  font: 500 14px/1.4 "Segoe UI", sans-serif;
+  border-top: 1px solid rgba(30, 22, 17, 0.06);
+}
+
+.bookmark-search-results {
+  overflow: auto;
+  padding: 12px 18px 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.bookmark-search-empty {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  color: var(--bookmark-overlay-muted);
+  font-size: 18px;
+}
+
+.bookmark-search-item {
+  border: 1px solid transparent;
+  border-radius: 18px;
+  padding: 16px 18px;
+  background: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+
+.bookmark-search-item:hover,
+.bookmark-search-item.active {
+  transform: translateY(-1px);
+  border-color: rgba(194, 82, 31, 0.28);
+  background: rgba(255, 250, 245, 0.96);
+}
+
+.bookmark-search-item strong {
+  display: block;
+  color: var(--bookmark-overlay-ink);
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.bookmark-search-item p {
+  margin: 6px 0 0;
+  color: var(--bookmark-overlay-muted);
+  font: 500 13px/1.45 "Segoe UI", sans-serif;
+  word-break: break-all;
+}
+
+.bookmark-search-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  padding: 14px 18px 18px;
+  border-top: 1px solid rgba(30, 22, 17, 0.08);
+  color: var(--bookmark-overlay-muted);
+  font: 500 13px/1.4 "Segoe UI", sans-serif;
+}
+
+.bookmark-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bookmark-chip kbd {
+  padding: 6px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(30, 22, 17, 0.12);
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--bookmark-overlay-ink);
+  font: 700 12px/1 "Segoe UI", sans-serif;
+}

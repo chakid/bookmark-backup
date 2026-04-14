@@ -1,0 +1,57 @@
+{
+  "manifest_version": 3,
+  "name": "Bookmark Backup to Gist",
+  "version": "1.0.0",
+  "description": "Real-time Chrome bookmark backup with GitHub Gist versioning and conflict detection.",
+  "permissions": [
+    "bookmarks",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://api.github.com/*",
+    "https://gist.githubusercontent.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "icons": {
+    "16": "icons/bookmark-star-16.png",
+    "32": "icons/bookmark-star-32.png",
+    "48": "icons/bookmark-star-48.png",
+    "128": "icons/bookmark-star-128.png"
+  },
+  "commands": {
+    "open-quick-search": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+F",
+        "mac": "Command+Shift+F"
+      },
+      "description": "Open bookmark quick search overlay"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content-search.js"
+      ],
+      "css": [
+        "content-search.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "options.html",
+  "action": {
+    "default_title": "Bookmark Backup",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/bookmark-star-16.png",
+      "32": "icons/bookmark-star-32.png"
+    }
+  }
+}

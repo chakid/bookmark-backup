@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bookmark Backup Settings</title>
+    <link rel="stylesheet" href="./options.css">
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <p class="eyebrow">Bookmark Backup to Gist</p>
+        <h1>Chrome 书签实时备份</h1>
+        <p class="lead">
+          把本地书签备份到 GitHub Gist，支持版本记录、冲突处理、远端恢复和本地搜索。
+        </p>
+      </section>
+
+      <section class="panel">
+        <h2>连接设置</h2>
+        <form id="settings-form" class="form">
+          <label>
+            <span>Provider</span>
+            <select id="providerType" name="providerType">
+              <option value="gist">GitHub Gist</option>
+              <option value="webdav" disabled>WebDAV（后续支持）</option>
+              <option value="local-folder" disabled>本地文件夹（后续支持）</option>
+            </select>
+          </label>
+
+          <label>
+            <span>GitHub Token</span>
+            <input id="gistToken" name="gistToken" type="password" placeholder="github_pat_xxx">
+            <small id="token-hint"></small>
+          </label>
+
+          <label>
+            <span>Gist ID</span>
+            <input id="gistId" name="gistId" type="text" placeholder="留空则首次备份时自动创建私有 Gist">
+          </label>
+
+          <label class="checkbox">
+            <input id="autoSyncEnabled" name="autoSyncEnabled" type="checkbox">
+            <span>启用自动同步</span>
+          </label>
+
+          <label>
+            <span>防抖间隔（毫秒）</span>
+            <input id="debounceMs" name="debounceMs" type="number" min="1000" step="500">
+          </label>
+
+          <div class="actions">
+            <button type="submit">保存设置</button>
+            <button type="button" id="verify-btn" class="secondary">验证连接</button>
+            <button type="button" id="sync-btn" class="secondary">立即备份</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>同步状态</h2>
+        <dl class="status-grid" id="status-grid"></dl>
+        <p id="message" class="message"></p>
+      </section>
+
+      <section class="panel">
+        <h2>书签搜索</h2>
+        <p>支持按书签标题、文件夹路径、网址进行模糊匹配。</p>
+        <div class="search-row">
+          <input id="search-input" type="search" placeholder="输入标题、文件夹或网址关键字">
+          <button type="button" id="search-btn" class="secondary">搜索</button>
+        </div>
+        <div id="search-results" class="search-results"></div>
+      </section>
+
+      <section class="panel">
+        <h2>远端恢复</h2>
+        <p>适合新电脑首次安装后，把 Gist 中最新的书签快照恢复到当前浏览器。</p>
+        <dl class="status-grid" id="remote-summary-grid"></dl>
+        <div class="actions">
+          <button type="button" id="load-remote-btn" class="secondary">读取远端最新快照</button>
+          <button type="button" id="restore-btn">恢复到本地书签</button>
+        </div>
+      </section>
+
+      <section class="panel" id="conflict-panel" hidden>
+        <h2>冲突处理</h2>
+        <p>检测到本地和远端都发生变化时，会先保留双版本，等待你决定如何处理。</p>
+        <pre id="conflict-detail" class="conflict-detail"></pre>
+        <div class="actions">
+          <button type="button" id="use-local-btn">以本地版本覆盖远端</button>
+          <button type="button" id="accept-remote-btn" class="secondary">接受远端作为最新基线</button>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="./options.js"></script>
+  </body>
+</html>
