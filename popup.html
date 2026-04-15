@@ -10,7 +10,6 @@
     <main class="popup-shell">
       <section class="hero-card">
         <div class="hero-copy">
-          <p class="eyebrow">Bookmark Backup</p>
           <h1>书签搜索与备份</h1>
           <p class="hero-text">搜索、同步、恢复都放在这里，先搜再操作。</p>
         </div>
@@ -18,9 +17,12 @@
       </section>
 
       <section class="panel panel-search">
-        <div class="section-head">
-          <p class="section-kicker">Quick Search</p>
-          <h2>搜索书签</h2>
+        <div class="section-head search-head">
+          <div class="search-head-copy">
+            <h2>搜索书签</h2>
+            <p class="search-head-note">支持空格 / AND 进行组合搜索</p>
+          </div>
+          <p id="search-summary" class="search-summary">文件夹 0 · 书签 0</p>
         </div>
         <label class="search-box" for="search-input">
           <span class="search-icon" aria-hidden="true">/</span>
@@ -30,42 +32,29 @@
       </section>
 
       <section class="panel panel-status">
-        <div class="status-grid">
-          <article class="stat">
-            <span class="stat-label">当前状态</span>
-            <strong id="status" class="stat-value">加载中...</strong>
-            <p id="subtext" class="stat-note"></p>
-          </article>
-          <article class="stat">
-            <span class="stat-label">上次同步</span>
+        <div class="section-head">
+          <h2>上次同步</h2>
+        </div>
+        <div class="status-grid status-grid-single">
+          <article class="stat stat-sync-only">
             <strong id="last-sync" class="stat-value">-</strong>
-            <p id="gist-id" class="stat-note"></p>
+            <p id="sync-detail" class="stat-note">尚未同步</p>
           </article>
         </div>
       </section>
 
       <section class="panel panel-conflict" id="conflict-card" hidden>
         <div class="section-head">
-          <p class="section-kicker">Conflict</p>
           <h2>冲突提醒</h2>
         </div>
         <p id="conflict-text" class="conflict-value">检测到本地 / 远端分叉</p>
         <p class="panel-copy">打开设置页可以选择以本地覆盖远端，或接受远端作为最新基线。</p>
       </section>
 
-      <section class="panel panel-remote" id="remote-card">
-        <div class="section-head">
-          <p class="section-kicker">Remote Snapshot</p>
-          <h2>远端快照</h2>
-        </div>
-        <p id="remote-version" class="remote-version">未读取</p>
-        <p id="remote-summary" class="panel-copy">可先读取远端最新快照，再决定是否恢复到本地书签。</p>
-      </section>
-
       <section class="action-bar">
         <button id="load-remote-btn" class="ghost">读取远端</button>
         <button id="restore-btn" class="ghost">恢复到本地</button>
-        <button id="sync-btn" class="primary">立即备份</button>
+        <button id="sync-btn" class="ghost">立即备份</button>
         <button id="options-btn" class="ghost">打开设置</button>
       </section>
     </main>

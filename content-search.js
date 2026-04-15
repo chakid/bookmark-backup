@@ -60,7 +60,7 @@ function ensureRoot() {
 
   root.querySelector(".bookmark-search-backdrop").addEventListener("click", closeOverlay);
   input.addEventListener("input", () => {
-    state.query = input.value;
+    state.query = input.value.trim();
     runSearch().catch(console.error);
   });
 
@@ -200,7 +200,12 @@ async function runSearch() {
     limit: 20
   });
 
-  state.results = result.ok ? result.results : [];
+  if (!result?.ok) {
+    console.error("Quick search failed:", result?.error);
+    state.results = [];
+  } else {
+    state.results = result.results || [];
+  }
   state.activeIndex = 0;
   renderResults();
 }

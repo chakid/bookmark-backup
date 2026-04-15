@@ -121,6 +121,10 @@ select {
   gap: 12px;
 }
 
+.form .message {
+  margin: 14px 0 0;
+}
+
 .remote-actions {
   margin-top: 18px;
   align-items: flex-start;

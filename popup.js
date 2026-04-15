@@ -10,10 +10,37 @@ function formatDate(value) {
   return new Date(value).toLocaleString();
 }
 
-function setSubtext(text, tone = "info") {
-  const node = document.querySelector("#subtext");
+function getLatestVersionText(syncState, settings) {
+  const versionId = syncState.lastKnownRemoteVersionId || syncState.remoteSnapshotSummary?.versionId || "";
+  if (versionId) {
+    return `最近一次版本：${versionId}`;
+  }
+
+  const gistId = syncState.gistId || settings.gistId || "";
+  if (gistId) {
+    return `Gist ID：${gistId}`;
+  }
+
+  return "尚未同步";
+}
+
+function setSyncDetail(text, tone = "info") {
+  const node = document.querySelector("#sync-detail");
+  if (!node) {
+    return;
+  }
+
   node.dataset.tone = tone;
   node.textContent = text;
+}
+
+function setSearchSummary(summary) {
+  const node = document.querySelector("#search-summary");
+  if (!node || !summary) {
+    return;
+  }
+
+  node.textContent = `文件夹 ${summary.folderCount} · 书签 ${summary.bookmarkCount}`;
 }
 
 function buildManualSyncMessage(result) {
@@ -27,16 +54,14 @@ function buildManualSyncMessage(result) {
   if (result.action === "push_local") {
     return {
       tone: "success",
-      text: result.versionId
-        ? `已备份到 Gist，版本 ${result.versionId}`
-        : "已备份到 Gist"
+      text: result.versionId ? `最近一次版本：${result.versionId}` : "已备份到 Gist"
     };
   }
 
   if (result.action === "adopt_remote" || result.action === "noop") {
     return {
       tone: "info",
-      text: "本地与远端已经一致，这次没有生成新的备份版本"
+      text: "本地与远端已经一致"
     };
   }
 
@@ -46,22 +71,12 @@ function buildManualSyncMessage(result) {
   };
 }
 
-function renderRemoteSummary(syncState) {
-  const summary = syncState.remoteSnapshotSummary;
-  if (!summary) {
-    document.querySelector("#remote-version").textContent = "未读取";
-    document.querySelector("#remote-summary").textContent =
-      "可以先读取远端最新快照，再决定是否恢复到本地书签。";
+function renderSearchResults(results) {
+  const node = document.querySelector("#search-results");
+  if (!node) {
     return;
   }
 
-  document.querySelector("#remote-version").textContent = summary.versionId;
-  document.querySelector("#remote-summary").textContent =
-    `${formatDate(summary.createdAt)} | ${summary.folderCount} 个文件夹 | ${summary.bookmarkCount} 个书签`;
-}
-
-function renderSearchResults(results) {
-  const node = document.querySelector("#search-results");
   if (!results.length) {
     node.innerHTML = "";
     return;
@@ -82,8 +97,20 @@ function renderSearchResults(results) {
     .join("");
 }
 
+async function loadSearchSummary() {
+  const result = await sendMessage("LOAD_SEARCH_SUMMARY");
+  if (result?.ok) {
+    setSearchSummary(result.summary);
+  }
+}
+
 async function runSearch() {
-  const query = document.querySelector("#search-input").value.trim();
+  const input = document.querySelector("#search-input");
+  if (!input) {
+    return;
+  }
+
+  const query = input.value.trim();
   if (!query) {
     renderSearchResults([]);
     return;
@@ -92,48 +119,51 @@ async function runSearch() {
   const result = await sendMessage("SEARCH_BOOKMARKS", { query, limit: 12 });
   renderSearchResults(result.ok ? result.results : []);
   if (!result.ok) {
-    setSubtext(result.error || "搜索失败", "error");
+    setSyncDetail(result.error || "搜索失败", "error");
   }
 }
 
-async function refresh({ preserveSubtext = false } = {}) {
-  const payload = await sendMessage("LOAD_STATUS");
-  const { syncState, settings } = payload;
+async function refresh({ preserveDetail = false } = {}) {
+  const [statusPayload] = await Promise.all([
+    sendMessage("LOAD_STATUS"),
+    loadSearchSummary()
+  ]);
+  const { syncState, settings } = statusPayload;
 
-  document.querySelector("#status").textContent = syncState.status;
-  document.querySelector("#last-sync").textContent = formatDate(syncState.lastSyncAt);
-  document.querySelector("#gist-id").textContent =
-    syncState.gistId || settings.gistId || "还没有创建远端 Gist";
+  const lastSyncNode = document.querySelector("#last-sync");
+  if (lastSyncNode) {
+    lastSyncNode.textContent = formatDate(syncState.lastSyncAt);
+  }
 
-  if (!preserveSubtext) {
-    setSubtext(
-      syncState.lastError ||
-        (syncState.remoteComparison === "remote_ahead"
-          ? "远端已经更新，可以先读取快照后恢复到本地。"
-          : "支持空格 / AND 进行组合搜索。"),
+  if (!preserveDetail) {
+    setSyncDetail(
+      syncState.lastError ? syncState.lastError : getLatestVersionText(syncState, settings),
       syncState.lastError ? "error" : "info"
     );
   }
 
   const conflictCard = document.querySelector("#conflict-card");
+  const conflictText = document.querySelector("#conflict-text");
+  if (!conflictCard || !conflictText) {
+    return;
+  }
+
   if (syncState.conflict) {
     conflictCard.hidden = false;
-    document.querySelector("#conflict-text").textContent =
+    conflictText.textContent =
       `本地 ${syncState.conflict.localVersion.versionId} / 远端 ${syncState.conflict.remoteVersion.versionId}`;
   } else {
     conflictCard.hidden = true;
   }
-
-  renderRemoteSummary(syncState);
 }
 
-document.querySelector("#search-input").addEventListener("input", () => {
+document.querySelector("#search-input")?.addEventListener("input", () => {
   runSearch().catch((error) => {
-    setSubtext(error.message, "error");
+    setSyncDetail(error.message, "error");
   });
 });
 
-document.querySelector("#search-results").addEventListener("click", async (event) => {
+document.querySelector("#search-results")?.addEventListener("click", async (event) => {
   const link = event.target.closest(".search-link");
   if (!link) {
     return;
@@ -148,35 +178,35 @@ document.querySelector("#search-results").addEventListener("click", async (event
   await sendMessage("OPEN_BOOKMARK_TAB", { url });
 });
 
-document.querySelector("#load-remote-btn").addEventListener("click", async () => {
-  setSubtext("正在读取远端最新快照...", "progress");
+document.querySelector("#load-remote-btn")?.addEventListener("click", async () => {
+  setSyncDetail("正在读取远端最新快照...", "progress");
   const result = await sendMessage("LOAD_REMOTE_SUMMARY");
-  await refresh({ preserveSubtext: true });
-  setSubtext(result.ok ? "已读取远端最新快照" : result.error || "读取失败", result.ok ? "success" : "error");
+  await refresh({ preserveDetail: true });
+  setSyncDetail(result.ok ? "已读取远端快照" : result.error || "读取失败", result.ok ? "success" : "error");
 });
 
-document.querySelector("#restore-btn").addEventListener("click", async () => {
-  setSubtext("正在恢复远端快照到本地...", "progress");
+document.querySelector("#restore-btn")?.addEventListener("click", async () => {
+  setSyncDetail("正在恢复远端快照到本地...", "progress");
   const result = await sendMessage("RESTORE_LATEST");
-  await refresh({ preserveSubtext: true });
-  setSubtext(
-    result.ok ? "已恢复远端最新快照到本地" : result.error || "恢复失败",
+  await refresh({ preserveDetail: true });
+  setSyncDetail(
+    result.ok ? "已恢复远端快照到本地" : result.error || "恢复失败",
     result.ok ? "success" : "error"
   );
 });
 
-document.querySelector("#sync-btn").addEventListener("click", async () => {
-  setSubtext("正在执行手动备份...", "progress");
+document.querySelector("#sync-btn")?.addEventListener("click", async () => {
+  setSyncDetail("正在执行手动备份...", "progress");
   const result = await sendMessage("SYNC_NOW");
-  await refresh({ preserveSubtext: true });
+  await refresh({ preserveDetail: true });
   const feedback = buildManualSyncMessage(result);
-  setSubtext(feedback.text, feedback.tone);
+  setSyncDetail(feedback.text, feedback.tone);
 });
 
-document.querySelector("#options-btn").addEventListener("click", () => {
+document.querySelector("#options-btn")?.addEventListener("click", () => {
   chrome.runtime.openOptionsPage();
 });
 
 refresh().catch((error) => {
-  setSubtext(error.message, "error");
+  setSyncDetail(error.message, "error");
 });

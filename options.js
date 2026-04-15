@@ -63,7 +63,7 @@ function debounceSecondsToMs(value) {
 let messageTimer = null;
 
 function setMessage(text, tone = "info") {
-  const node = document.querySelector("#message");
+  const node = document.querySelector("#form-message");
   if (messageTimer) {
     clearTimeout(messageTimer);
     messageTimer = null;
@@ -85,7 +85,7 @@ function setMessage(text, tone = "info") {
       if (node.dataset.tone === "success" && node.textContent === text) {
         setMessage("");
       }
-    }, 3000);
+    }, 2000);
   }
 }
 

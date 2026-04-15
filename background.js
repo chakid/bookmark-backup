@@ -1,5 +1,10 @@
 import { DEFAULT_SETTINGS, STORAGE_KEYS } from "./lib/constants.js";
-import { buildBookmarkSearchIndex, searchBookmarkIndex } from "./lib/bookmarks.js";
+import {
+  buildBookmarkSearchIndex,
+  normalizeBookmarkTree,
+  searchBookmarkIndex,
+  summarizeNormalizedTree
+} from "./lib/bookmarks.js";
 import { maskToken } from "./lib/utils.js";
 import {
   getPublicStatus,
@@ -42,6 +47,11 @@ async function refreshSearchCache() {
   const index = buildBookmarkSearchIndex(rawTree);
   await writeSearchCache(index);
   return index;
+}
+
+async function loadSearchSummary() {
+  const rawTree = await chrome.bookmarks.getTree();
+  return summarizeNormalizedTree(normalizeBookmarkTree(rawTree));
 }
 
 async function ensureSearchCache() {
@@ -253,6 +263,11 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
           results: searchBookmarkIndex(index, message.query ?? "", message.limit ?? 20)
         };
       }
+      case "LOAD_SEARCH_SUMMARY":
+        return {
+          ok: true,
+          summary: await loadSearchSummary()
+        };
       case "OPEN_BOOKMARK_TAB":
         await chrome.tabs.create({ url: message.url });
         return { ok: true };
