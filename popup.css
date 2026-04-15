@@ -102,8 +102,12 @@ body {
 }
 
 .panel {
-  margin-top: 14px;
+  margin-top: 12px;
   padding: 18px;
+}
+
+.panel-search {
+  padding-bottom: 10px;
 }
 
 .section-head h2 {
@@ -182,7 +186,7 @@ body {
 .search-results {
   display: grid;
   gap: 10px;
-  margin-top: 14px;
+  margin-top: 8px;
   max-height: 240px;
   overflow: auto;
   padding-right: 2px;
@@ -302,7 +306,7 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin-top: 14px;
+  margin-top: 24px;
 }
 
 button {
@@ -326,7 +330,14 @@ button.primary {
 
 button.ghost {
   color: var(--ink);
-  background: var(--paper);
+  background: rgb(251, 247, 240);
   border: 1px solid var(--surface-line);
   box-shadow: var(--surface-shadow);
+  transition: background 140ms ease, color 140ms ease, border-color 140ms ease;
+}
+
+button.ghost:hover {
+  background: rgb(136, 52, 23);
+  color: white;
+  border-color: rgb(136, 52, 23);
 }
