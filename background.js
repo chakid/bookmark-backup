@@ -15,6 +15,7 @@ let syncTimer = null;
 let bookmarkMutationLocks = 0;
 let bookmarkSearchCache = null;
 let engineInstance = null;
+const SYNC_ALARM_NAME = "bookmarkBackup.sync";
 
 function getEngine() {
   if (!engineInstance) {
@@ -59,16 +60,23 @@ async function ensureSearchCache() {
 
 async function scheduleSync(reason, forceImmediate = false) {
   const settings = await getSettings();
-  const delay = forceImmediate ? 0 : Math.max(1000, settings.debounceMs ?? DEFAULT_SETTINGS.debounceMs);
+  const delay = forceImmediate ? 0 : Math.max(5000, settings.debounceMs ?? DEFAULT_SETTINGS.debounceMs);
 
   if (syncTimer) {
     clearTimeout(syncTimer);
+    syncTimer = null;
   }
 
-  syncTimer = setTimeout(async () => {
-    syncTimer = null;
-    await getEngine().sync({ reason });
-  }, delay);
+  await chrome.storage.local.set({
+    [STORAGE_KEYS.scheduledSync]: {
+      reason
+    }
+  });
+
+  await chrome.alarms.clear(SYNC_ALARM_NAME);
+  await chrome.alarms.create(SYNC_ALARM_NAME, {
+    when: Date.now() + delay
+  });
 }
 
 async function markLocalChange(reason) {
@@ -194,6 +202,23 @@ chrome.bookmarks.onImportEnded.addListener(() => {
   markLocalChange("import-ended").catch(console.error);
 });
 
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name !== SYNC_ALARM_NAME) {
+    return;
+  }
+
+  Promise.resolve()
+    .then(async () => {
+      const result = await chrome.storage.local.get(STORAGE_KEYS.scheduledSync);
+      const scheduledSync = result[STORAGE_KEYS.scheduledSync];
+      await chrome.storage.local.remove(STORAGE_KEYS.scheduledSync);
+      await getEngine().sync({
+        reason: scheduledSync?.reason ?? "scheduled"
+      });
+    })
+    .catch(console.error);
+});
+
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   (async () => {
     switch (message?.type) {
@@ -212,7 +237,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       case "VERIFY_PROVIDER":
         return getEngine().verifyProvider();
       case "SYNC_NOW":
-        return getEngine().sync({ reason: "manual", forcePush: false });
+        return getEngine().sync({ reason: "manual", forcePush: true });
       case "LOAD_REMOTE_SUMMARY":
         return getEngine().loadRemoteSnapshotSummary();
       case "RESTORE_LATEST":

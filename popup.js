@@ -10,12 +10,48 @@ function formatDate(value) {
   return new Date(value).toLocaleString();
 }
 
+function setSubtext(text, tone = "info") {
+  const node = document.querySelector("#subtext");
+  node.dataset.tone = tone;
+  node.textContent = text;
+}
+
+function buildManualSyncMessage(result) {
+  if (!result?.ok) {
+    return {
+      tone: "error",
+      text: result?.error || "备份失败"
+    };
+  }
+
+  if (result.action === "push_local") {
+    return {
+      tone: "success",
+      text: result.versionId
+        ? `已备份到 Gist，版本 ${result.versionId}`
+        : "已备份到 Gist"
+    };
+  }
+
+  if (result.action === "adopt_remote" || result.action === "noop") {
+    return {
+      tone: "info",
+      text: "本地与远端已经一致，这次没有生成新的备份版本"
+    };
+  }
+
+  return {
+    tone: "success",
+    text: "备份完成"
+  };
+}
+
 function renderRemoteSummary(syncState) {
   const summary = syncState.remoteSnapshotSummary;
   if (!summary) {
     document.querySelector("#remote-version").textContent = "未读取";
     document.querySelector("#remote-summary").textContent =
-      "可先读取远端最新快照，再决定是否恢复到本地书签。";
+      "可以先读取远端最新快照，再决定是否恢复到本地书签。";
     return;
   }
 
@@ -56,11 +92,11 @@ async function runSearch() {
   const result = await sendMessage("SEARCH_BOOKMARKS", { query, limit: 12 });
   renderSearchResults(result.ok ? result.results : []);
   if (!result.ok) {
-    document.querySelector("#subtext").textContent = result.error || "搜索失败";
+    setSubtext(result.error || "搜索失败", "error");
   }
 }
 
-async function refresh() {
+async function refresh({ preserveSubtext = false } = {}) {
   const payload = await sendMessage("LOAD_STATUS");
   const { syncState, settings } = payload;
 
@@ -68,11 +104,16 @@ async function refresh() {
   document.querySelector("#last-sync").textContent = formatDate(syncState.lastSyncAt);
   document.querySelector("#gist-id").textContent =
     syncState.gistId || settings.gistId || "还没有创建远端 Gist";
-  document.querySelector("#subtext").textContent =
-    syncState.lastError ||
-    (syncState.remoteComparison === "remote_ahead"
-      ? "远端已经更新，可以读取快照后恢复到本地。"
-      : "支持空格 / AND 进行组合搜索。");
+
+  if (!preserveSubtext) {
+    setSubtext(
+      syncState.lastError ||
+        (syncState.remoteComparison === "remote_ahead"
+          ? "远端已经更新，可以先读取快照后恢复到本地。"
+          : "支持空格 / AND 进行组合搜索。"),
+      syncState.lastError ? "error" : "info"
+    );
+  }
 
   const conflictCard = document.querySelector("#conflict-card");
   if (syncState.conflict) {
@@ -88,7 +129,7 @@ async function refresh() {
 
 document.querySelector("#search-input").addEventListener("input", () => {
   runSearch().catch((error) => {
-    document.querySelector("#subtext").textContent = error.message;
+    setSubtext(error.message, "error");
   });
 });
 
@@ -108,30 +149,28 @@ document.querySelector("#search-results").addEventListener("click", async (event
 });
 
 document.querySelector("#load-remote-btn").addEventListener("click", async () => {
-  document.querySelector("#subtext").textContent = "正在读取远端最新快照...";
+  setSubtext("正在读取远端最新快照...", "progress");
   const result = await sendMessage("LOAD_REMOTE_SUMMARY");
-  document.querySelector("#subtext").textContent = result.ok
-    ? "已读取远端最新快照"
-    : result.error || "读取失败";
-  await refresh();
+  await refresh({ preserveSubtext: true });
+  setSubtext(result.ok ? "已读取远端最新快照" : result.error || "读取失败", result.ok ? "success" : "error");
 });
 
 document.querySelector("#restore-btn").addEventListener("click", async () => {
-  document.querySelector("#subtext").textContent = "正在恢复远端快照到本地...";
+  setSubtext("正在恢复远端快照到本地...", "progress");
   const result = await sendMessage("RESTORE_LATEST");
-  document.querySelector("#subtext").textContent = result.ok
-    ? "已恢复远端最新快照到本地"
-    : result.error || "恢复失败";
-  await refresh();
+  await refresh({ preserveSubtext: true });
+  setSubtext(
+    result.ok ? "已恢复远端最新快照到本地" : result.error || "恢复失败",
+    result.ok ? "success" : "error"
+  );
 });
 
 document.querySelector("#sync-btn").addEventListener("click", async () => {
-  document.querySelector("#subtext").textContent = "正在执行手动备份...";
+  setSubtext("正在执行手动备份...", "progress");
   const result = await sendMessage("SYNC_NOW");
-  document.querySelector("#subtext").textContent = result.ok
-    ? "备份完成"
-    : result.error || "备份失败";
-  await refresh();
+  await refresh({ preserveSubtext: true });
+  const feedback = buildManualSyncMessage(result);
+  setSubtext(feedback.text, feedback.tone);
 });
 
 document.querySelector("#options-btn").addEventListener("click", () => {
@@ -139,5 +178,5 @@ document.querySelector("#options-btn").addEventListener("click", () => {
 });
 
 refresh().catch((error) => {
-  document.querySelector("#subtext").textContent = error.message;
+  setSubtext(error.message, "error");
 });

@@ -52,10 +52,75 @@ function formatDate(value) {
   return new Date(value).toLocaleString();
 }
 
-function setMessage(text, isError = false) {
+function debounceMsToSeconds(value) {
+  return Math.max(5, Math.round((Number(value) || 5000) / 1000));
+}
+
+function debounceSecondsToMs(value) {
+  return Math.max(5, Number(value) || 5) * 1000;
+}
+
+let messageTimer = null;
+
+function setMessage(text, tone = "info") {
   const node = document.querySelector("#message");
+  if (messageTimer) {
+    clearTimeout(messageTimer);
+    messageTimer = null;
+  }
+
+  if (!text) {
+    node.hidden = true;
+    node.dataset.tone = "";
+    node.textContent = "";
+    return;
+  }
+
+  node.hidden = false;
+  node.dataset.tone = tone;
   node.textContent = text;
-  node.style.color = isError ? "#b42318" : "#0f766e";
+
+  if (tone === "success") {
+    messageTimer = setTimeout(() => {
+      if (node.dataset.tone === "success" && node.textContent === text) {
+        setMessage("");
+      }
+    }, 3000);
+  }
+}
+
+function setErrorMessage(text) {
+  setMessage(text, "error");
+}
+
+function buildManualSyncMessage(result) {
+  if (!result?.ok) {
+    return {
+      tone: "error",
+      text: result?.error || "备份失败"
+    };
+  }
+
+  if (result.action === "push_local") {
+    return {
+      tone: "success",
+      text: result.versionId
+        ? `已立即备份到 Gist，版本 ${result.versionId}`
+        : "已立即备份到 Gist"
+    };
+  }
+
+  if (result.action === "adopt_remote" || result.action === "noop") {
+    return {
+      tone: "info",
+      text: "本地与远端已经一致，这次没有生成新的备份版本"
+    };
+  }
+
+  return {
+    tone: "success",
+    text: "备份已完成"
+  };
 }
 
 function renderGrid(targetId, items) {
@@ -165,26 +230,30 @@ async function runSearch() {
     const rawTree = await chrome.bookmarks.getTree();
     renderSearchResults(searchBookmarksTree(rawTree, query, 30));
   } catch (error) {
-    setMessage(error.message || "搜索失败", true);
+    setErrorMessage(error.message || "搜索失败");
   }
 }
 
-async function loadPage() {
+async function loadPage({ preserveMessage = false } = {}) {
   const settings = await getSettings();
   const statusPayload = await loadLocalStatusPayload();
 
   document.querySelector("#providerType").value = settings.providerType;
   document.querySelector("#gistId").value = settings.gistId ?? "";
   document.querySelector("#autoSyncEnabled").checked = Boolean(settings.autoSyncEnabled);
-  document.querySelector("#debounceMs").value = settings.debounceMs ?? 5000;
+  document.querySelector("#debounceMs").value = debounceMsToSeconds(settings.debounceMs);
   document.querySelector("#token-hint").textContent = settings.gistToken
     ? `已保存 Token：${maskToken(settings.gistToken)}`
     : "尚未保存 Token";
 
   renderStatus(statusPayload);
 
+  if (preserveMessage) {
+    return;
+  }
+
   if (statusPayload.syncState.lastError) {
-    setMessage(statusPayload.syncState.lastError, true);
+    setErrorMessage(statusPayload.syncState.lastError);
   } else {
     setMessage("");
   }
@@ -199,7 +268,7 @@ document.querySelector("#settings-form").addEventListener("submit", async (event
       providerType: document.querySelector("#providerType").value,
       gistId: document.querySelector("#gistId").value.trim(),
       autoSyncEnabled: document.querySelector("#autoSyncEnabled").checked,
-      debounceMs: Number(document.querySelector("#debounceMs").value) || 5000
+      debounceMs: debounceSecondsToMs(document.querySelector("#debounceMs").value)
     };
 
     const tokenValue = document.querySelector("#gistToken").value.trim();
@@ -207,7 +276,7 @@ document.querySelector("#settings-form").addEventListener("submit", async (event
       payload.gistToken = tokenValue;
     }
 
-    setMessage("正在保存设置...");
+    setMessage("正在保存设置...", "progress");
     const saved = await saveSettings(payload);
 
     const connectionChanged =
@@ -222,61 +291,68 @@ document.querySelector("#settings-form").addEventListener("submit", async (event
     }
 
     document.querySelector("#gistToken").value = "";
-    document.querySelector("#token-hint").textContent = saved.gistToken
-      ? `已保存 Token：${maskToken(saved.gistToken)}`
-      : "尚未保存 Token";
-
-    setMessage("设置已保存");
-    await loadPage();
+    await loadPage({ preserveMessage: true });
+    setMessage("设置已保存", "success");
   } catch (error) {
-    setMessage(error.message || "保存失败", true);
+    setErrorMessage(error.message || "保存失败");
   }
 });
 
 document.querySelector("#verify-btn").addEventListener("click", async () => {
   try {
-    setMessage("正在验证连接...");
+    setMessage("正在验证连接...", "progress");
     const settings = await getSettings();
     const provider = createBackupProvider(settings);
     const result = await provider.verifyConfig();
-    setMessage(result.ok ? result.reason : result.error || result.reason, !result.ok);
+    setMessage(result.ok ? result.reason : result.error || result.reason, result.ok ? "success" : "error");
   } catch (error) {
-    setMessage(error.message || "验证失败", true);
+    setErrorMessage(error.message || "验证失败");
   }
 });
 
 document.querySelector("#sync-btn").addEventListener("click", async () => {
-  setMessage("正在执行手动备份...");
+  setMessage("正在执行手动备份...", "progress");
   const result = await sendMessage("SYNC_NOW");
-  setMessage(result.ok ? "备份已完成" : result.error || "备份失败", !result.ok);
-  await loadPage();
+  await loadPage({ preserveMessage: true });
+  const feedback = buildManualSyncMessage(result);
+  setMessage(feedback.text, feedback.tone);
 });
 
 document.querySelector("#load-remote-btn").addEventListener("click", async () => {
-  setMessage("正在读取远端最新快照...");
+  setMessage("正在读取远端最新快照...", "progress");
   const result = await sendMessage("LOAD_REMOTE_SUMMARY");
-  setMessage(result.ok ? "已读取远端最新快照" : result.error || "读取失败", !result.ok);
-  await loadPage();
+  await loadPage({ preserveMessage: true });
+  setMessage(result.ok ? "已读取远端最新快照" : result.error || "读取失败", result.ok ? "success" : "error");
 });
 
 document.querySelector("#restore-btn").addEventListener("click", async () => {
-  setMessage("正在把远端最新快照恢复到本地书签...");
+  setMessage("正在把远端最新快照恢复到本地书签...", "progress");
   const result = await sendMessage("RESTORE_LATEST");
-  setMessage(result.ok ? "已恢复远端最新快照到本地书签" : result.error || "恢复失败", !result.ok);
-  await loadPage();
+  await loadPage({ preserveMessage: true });
+  setMessage(
+    result.ok ? "已恢复远端最新快照到本地书签" : result.error || "恢复失败",
+    result.ok ? "success" : "error"
+  );
 });
 
 document.querySelector("#use-local-btn").addEventListener("click", async () => {
-  setMessage("正在以本地版本覆盖远端...");
+  setMessage("正在用本地版本覆盖远端...", "progress");
   const result = await sendMessage("RESOLVE_CONFLICT", { strategy: "use_local" });
-  setMessage(result.ok ? "冲突已按本地版本解决" : result.error || "冲突处理失败", !result.ok);
-  await loadPage();
+  await loadPage({ preserveMessage: true });
+  setMessage(
+    result.ok ? "冲突已按本地版本解决" : result.error || "冲突处理失败",
+    result.ok ? "success" : "error"
+  );
 });
 
 document.querySelector("#accept-remote-btn").addEventListener("click", async () => {
+  setMessage("正在接受远端版本...", "progress");
   const result = await sendMessage("RESOLVE_CONFLICT", { strategy: "accept_remote" });
-  setMessage(result.ok ? "已接受远端作为最新基线" : result.error || "冲突处理失败", !result.ok);
-  await loadPage();
+  await loadPage({ preserveMessage: true });
+  setMessage(
+    result.ok ? "已接受远端作为最新基线" : result.error || "冲突处理失败",
+    result.ok ? "success" : "error"
+  );
 });
 
 document.querySelector("#search-btn").addEventListener("click", runSearch);
@@ -288,15 +364,16 @@ document.querySelector("#search-results").addEventListener("click", async (event
 
   await chrome.tabs.create({ url: item.dataset.url });
 });
+
 document.querySelector("#search-input").addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
     event.preventDefault();
     runSearch().catch((error) => {
-      setMessage(error.message, true);
+      setErrorMessage(error.message);
     });
   }
 });
 
 loadPage().catch((error) => {
-  setMessage(error.message, true);
+  setErrorMessage(error.message);
 });

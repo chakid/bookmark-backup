@@ -5,6 +5,7 @@
   "description": "Real-time Chrome bookmark backup with GitHub Gist versioning and conflict detection.",
   "permissions": [
     "bookmarks",
+    "alarms",
     "storage",
     "tabs"
   ],

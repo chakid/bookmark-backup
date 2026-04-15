@@ -45,8 +45,8 @@
           </label>
 
           <label>
-            <span>防抖间隔（毫秒）</span>
-            <input id="debounceMs" name="debounceMs" type="number" min="1000" step="500">
+            <span>防抖间隔（秒）</span>
+            <input id="debounceMs" name="debounceMs" type="number" min="5" step="1">
           </label>
 
           <div class="actions">
@@ -60,7 +60,7 @@
       <section class="panel">
         <h2>同步状态</h2>
         <dl class="status-grid" id="status-grid"></dl>
-        <p id="message" class="message"></p>
+        <p id="message" class="message" hidden></p>
       </section>
 
       <section class="panel">
@@ -77,7 +77,7 @@
         <h2>远端恢复</h2>
         <p>适合新电脑首次安装后，把 Gist 中最新的书签快照恢复到当前浏览器。</p>
         <dl class="status-grid" id="remote-summary-grid"></dl>
-        <div class="actions">
+        <div class="actions remote-actions">
           <button type="button" id="load-remote-btn" class="secondary">读取远端最新快照</button>
           <button type="button" id="restore-btn">恢复到本地书签</button>
         </div>

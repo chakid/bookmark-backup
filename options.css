@@ -121,6 +121,15 @@ select {
   gap: 12px;
 }
 
+.remote-actions {
+  margin-top: 18px;
+  align-items: flex-start;
+}
+
+.remote-actions button {
+  min-width: 214px;
+}
+
 button {
   border: 0;
   border-radius: 999px;
@@ -164,11 +173,53 @@ button.secondary {
 .status-grid dd {
   margin: 0;
   font-weight: 700;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .message {
-  margin-bottom: 0;
+  margin: 16px 0 0;
   min-height: 24px;
+  padding: 12px 14px;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--muted);
+  line-height: 1.5;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.message[hidden] {
+  display: none;
+}
+
+.message[data-tone="info"] {
+  border-color: rgba(32, 29, 22, 0.08);
+  color: var(--text);
+}
+
+.message[data-tone="progress"] {
+  border-color: rgba(15, 118, 110, 0.18);
+  background: linear-gradient(180deg, rgba(236, 250, 248, 0.98), rgba(243, 255, 252, 0.92));
+  color: #0f5d58;
+}
+
+.message[data-tone="success"] {
+  border-color: rgba(15, 118, 110, 0.24);
+  background: linear-gradient(180deg, rgba(233, 249, 246, 0.98), rgba(241, 253, 250, 0.92));
+  color: #0a625c;
+  box-shadow: 0 12px 24px rgba(15, 118, 110, 0.08);
+}
+
+.message[data-tone="error"] {
+  border-color: rgba(180, 35, 24, 0.2);
+  background: linear-gradient(180deg, rgba(255, 244, 242, 0.98), rgba(255, 250, 248, 0.92));
+  color: var(--danger);
 }
 
 .search-row {
@@ -245,6 +296,11 @@ button.secondary {
 
   .actions {
     flex-direction: column;
+  }
+
+  .remote-actions button {
+    width: 100%;
+    min-width: 0;
   }
 
   .search-row {

@@ -235,6 +235,18 @@ body {
   word-break: break-word;
 }
 
+.stat-note[data-tone="progress"] {
+  color: var(--teal);
+}
+
+.stat-note[data-tone="success"] {
+  color: #0a625c;
+}
+
+.stat-note[data-tone="error"] {
+  color: var(--warn);
+}
+
 .panel-conflict {
   background: linear-gradient(180deg, rgba(255, 245, 242, 0.94), rgba(255, 249, 246, 0.9));
 }

@@ -60,6 +60,35 @@ test("adopts remote when hashes already match", () => {
   assert.equal(plan.conflictType, "none");
 });
 
+test("force push creates a new remote backup even when hashes already match", () => {
+  const plan = determineSyncPlan({
+    localSnapshot: {
+      ...baseLocalSnapshot,
+      metadata: {
+        ...baseLocalSnapshot.metadata,
+        treeHash: "same-hash"
+      }
+    },
+    remoteBundle: {
+      manifest: {
+        latestVersion: {
+          versionId: "remote-v2",
+          treeHash: "same-hash"
+        }
+      },
+      tree: [{ id: "1", title: "root", index: 0 }]
+    },
+    syncState: {
+      lastKnownRemoteVersionId: "remote-v2",
+      lastSyncedTreeHash: "same-hash"
+    },
+    forcePush: true
+  });
+
+  assert.equal(plan.type, "push_local");
+  assert.equal(plan.expectedRevision, "remote-v2");
+});
+
 test("detects divergence when both remote and local changed", () => {
   const plan = determineSyncPlan({
     localSnapshot: baseLocalSnapshot,
