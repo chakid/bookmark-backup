@@ -1,18 +1,20 @@
 :root {
-  --bg: #f3ede3;
-  --paper: rgba(255, 251, 245, 0.86);
-  --paper-strong: rgba(255, 250, 243, 0.94);
-  --surface-soft: rgba(255, 255, 255, 0.6);
-  --surface-line: rgba(25, 20, 16, 0.08);
-  --surface-shadow: 0 10px 20px rgba(53, 38, 23, 0.06);
-  --ink: #191410;
-  --muted: #6b6258;
-  --line: rgba(25, 20, 16, 0.12);
-  --accent: #c2521f;
-  --accent-deep: #8f3413;
-  --teal: #0f766e;
-  --warn: #b42318;
-  --shadow: 0 30px 70px rgba(53, 38, 23, 0.16);
+  --bg: #F5F8FF;
+  --paper: #FFFFFF;
+  --paper-strong: #FFFFFF;
+  --surface-soft: #E8F3FF;
+  --surface-line: #D6E9FF;
+  --surface-shadow: 0 10px 20px rgba(64, 150, 255, 0.08);
+  --ink: #1F2329;
+  --muted: #6E737A;
+  --line: #D6E9FF;
+  --accent: #1677FF;
+  --accent-deep: #4096FF;
+  --accent-gradient: linear-gradient(135deg, #4096FF, #1677FF);
+  --teal: #1677FF;
+  --warn: #dc2626;
+  --shadow: 0 30px 70px rgba(64, 150, 255, 0.12);
+  --data-blue: #1677FF;
 }
 
 * {
@@ -27,12 +29,9 @@ body {
 
 body {
   width: 460px;
-  font-family: Georgia, "Noto Serif SC", "Songti SC", serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color: var(--ink);
-  background:
-    radial-gradient(circle at top left, rgba(194, 82, 31, 0.18), transparent 24%),
-    radial-gradient(circle at 90% 14%, rgba(15, 118, 110, 0.18), transparent 22%),
-    linear-gradient(180deg, #f8f3eb 0%, var(--bg) 100%);
+  background: linear-gradient(180deg, #FAFBFF 0%, var(--bg) 100%);
 }
 
 .popup-shell {
@@ -55,9 +54,12 @@ body {
   grid-template-columns: 1fr 42px;
   gap: 8px;
   padding: 20px 12px 14px;
-  background:
-    linear-gradient(135deg, rgba(255, 247, 240, 0.96), rgba(249, 241, 232, 0.88)),
-    var(--paper);
+  background: var(--surface-soft);
+  border-color: var(--surface-line);
+}
+
+.panel {
+  background: var(--paper);
 }
 
 .hero-copy h1 {
@@ -93,11 +95,11 @@ body {
   justify-self: end;
   border-radius: 14px;
   background:
-    radial-gradient(circle at 28% 28%, rgba(255, 255, 255, 0.8), transparent 24%),
-    linear-gradient(145deg, #d35d29, #6e2510);
+    radial-gradient(circle at 28% 28%, rgba(255, 255, 255, 0.9), transparent 24%),
+    var(--accent-gradient);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 8px 14px rgba(143, 52, 19, 0.2);
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 8px 14px rgba(22, 119, 255, 0.25);
   transform: rotate(12deg);
 }
 
@@ -142,7 +144,7 @@ body {
   margin: 0;
   flex-shrink: 0;
   font: 600 11px/1.2 "Segoe UI", "PingFang SC", sans-serif;
-  color: var(--muted);
+  color: var(--data-blue);
 }
 
 .search-box {
@@ -167,7 +169,7 @@ body {
   font-family: "Segoe UI", sans-serif;
   font-weight: 700;
   color: white;
-  background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+  background: var(--accent-gradient);
 }
 
 .search-box input {
@@ -193,17 +195,17 @@ body {
 }
 
 .search-item {
-  border: 1px solid rgba(25, 20, 16, 0.1);
+  border: 1px solid var(--surface-line);
   border-radius: 18px;
   padding: 14px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 248, 242, 0.92));
+  background: #FAFBFF;
   transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
 }
 
 .search-item:hover {
   transform: translateY(-1px);
-  box-shadow: 0 16px 28px rgba(43, 27, 16, 0.1);
-  border-color: rgba(194, 82, 31, 0.28);
+  box-shadow: 0 16px 28px rgba(64, 150, 255, 0.12);
+  border-color: var(--accent);
 }
 
 .search-link {
@@ -255,6 +257,7 @@ body {
   line-height: 1.08;
   font-weight: 700;
   overflow-wrap: anywhere;
+  color: var(--data-blue);
 }
 
 .stat-sync-only .stat-value,
@@ -277,11 +280,11 @@ body {
 }
 
 .stat-note[data-tone="progress"] {
-  color: var(--teal);
+  color: var(--accent);
 }
 
 .stat-note[data-tone="success"] {
-  color: #0a625c;
+  color: #0e6fd6;
 }
 
 .stat-note[data-tone="error"] {
@@ -324,20 +327,26 @@ button:hover {
 
 button.primary {
   color: white;
-  background: linear-gradient(135deg, var(--accent), var(--accent-deep));
-  box-shadow: 0 16px 24px rgba(143, 52, 19, 0.22);
+  background: var(--accent-gradient);
+  box-shadow: 0 16px 24px rgba(22, 119, 255, 0.22);
 }
 
 button.ghost {
-  color: var(--ink);
-  background: rgb(251, 247, 240);
+  color: var(--accent);
+  background: var(--surface-soft);
   border: 1px solid var(--surface-line);
   box-shadow: var(--surface-shadow);
   transition: background 140ms ease, color 140ms ease, border-color 140ms ease;
 }
 
 button.ghost:hover {
-  background: rgb(136, 52, 23);
+  background: #2d88ff;
   color: white;
-  border-color: rgb(136, 52, 23);
+  border-color: #2d88ff;
+}
+
+button.ghost:active {
+  background: #2d88ff;
+  color: white;
+  border-color: #2d88ff;
 }

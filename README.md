@@ -9,10 +9,8 @@
 - 可判断新旧：保存版本元数据，识别谁新谁旧
 - 可检测冲突：本地和远端同时变化时不直接覆盖
 
-![alt text](image-3.png)
-
+![alt text](image.png)
 ![alt text](image-1.png)
-
 ![alt text](image-2.png)
 
 ## 当前进度

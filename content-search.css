@@ -1,13 +1,13 @@
 :root {
-  --bookmark-overlay-bg: rgba(14, 12, 10, 0.42);
-  --bookmark-overlay-shell: rgba(252, 249, 243, 0.94);
-  --bookmark-overlay-line: rgba(30, 22, 17, 0.12);
-  --bookmark-overlay-ink: #18120e;
-  --bookmark-overlay-muted: #72675e;
-  --bookmark-overlay-accent: #c2521f;
-  --bookmark-overlay-accent-deep: #8d3413;
-  --bookmark-overlay-panel: rgba(255, 255, 255, 0.75);
-  --bookmark-overlay-shadow: 0 40px 90px rgba(33, 19, 9, 0.28);
+  --bookmark-overlay-bg: rgba(10, 25, 45, 0.45);
+  --bookmark-overlay-shell: rgba(250, 252, 255, 0.96);
+  --bookmark-overlay-line: rgba(30, 58, 95, 0.12);
+  --bookmark-overlay-ink: #1a2733;
+  --bookmark-overlay-muted: #5a6c7d;
+  --bookmark-overlay-accent: #2563eb;
+  --bookmark-overlay-accent-deep: #1d4ed8;
+  --bookmark-overlay-panel: rgba(255, 255, 255, 0.8);
+  --bookmark-overlay-shadow: 0 40px 90px rgba(10, 25, 45, 0.3);
 }
 
 #bookmark-quick-search-root {
@@ -26,8 +26,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at top left, rgba(194, 82, 31, 0.16), transparent 25%),
-    radial-gradient(circle at top right, rgba(15, 118, 110, 0.16), transparent 22%),
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 25%),
+    radial-gradient(circle at top right, rgba(8, 145, 178, 0.1), transparent 22%),
     var(--bookmark-overlay-bg);
   backdrop-filter: blur(14px);
   opacity: 0;
@@ -64,8 +64,8 @@
 .bookmark-search-topbar {
   padding: 20px 22px 16px;
   background:
-    radial-gradient(circle at right top, rgba(194, 82, 31, 0.12), transparent 30%),
-    linear-gradient(180deg, rgba(255, 249, 240, 0.96), rgba(249, 243, 235, 0.92));
+    radial-gradient(circle at right top, rgba(37, 99, 235, 0.1), transparent 30%),
+    linear-gradient(180deg, rgba(250, 252, 255, 0.96), rgba(240, 248, 255, 0.92));
 }
 
 .bookmark-search-kicker {
@@ -115,14 +115,14 @@
 }
 
 .bookmark-search-input::placeholder {
-  color: #a2978d;
+  color: #9ca3af;
 }
 
 .bookmark-search-hint {
   padding: 12px 22px 14px;
   color: var(--bookmark-overlay-muted);
   font: 500 14px/1.4 "Segoe UI", sans-serif;
-  border-top: 1px solid rgba(30, 22, 17, 0.06);
+  border-top: 1px solid rgba(30, 58, 95, 0.06);
 }
 
 .bookmark-search-results {
@@ -152,8 +152,8 @@
 .bookmark-search-item:hover,
 .bookmark-search-item.active {
   transform: translateY(-1px);
-  border-color: rgba(194, 82, 31, 0.28);
-  background: rgba(255, 250, 245, 0.96);
+  border-color: rgba(37, 99, 235, 0.28);
+  background: rgba(240, 248, 255, 0.96);
 }
 
 .bookmark-search-item strong {
@@ -175,7 +175,7 @@
   flex-wrap: wrap;
   gap: 10px 18px;
   padding: 14px 18px 18px;
-  border-top: 1px solid rgba(30, 22, 17, 0.08);
+  border-top: 1px solid rgba(30, 58, 95, 0.08);
   color: var(--bookmark-overlay-muted);
   font: 500 13px/1.4 "Segoe UI", sans-serif;
 }
@@ -189,7 +189,7 @@
 .bookmark-chip kbd {
   padding: 6px 10px;
   border-radius: 12px;
-  border: 1px solid rgba(30, 22, 17, 0.12);
+  border: 1px solid rgba(30, 58, 95, 0.12);
   background: rgba(255, 255, 255, 0.86);
   color: var(--bookmark-overlay-ink);
   font: 700 12px/1 "Segoe UI", sans-serif;
