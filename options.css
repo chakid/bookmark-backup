@@ -141,11 +141,12 @@ button {
   cursor: pointer;
   background: var(--accent);
   color: white;
-  transition: transform 120ms ease;
+  box-shadow: 0 10px 18px rgba(37, 99, 235, 0);
+  transition: background 120ms ease, box-shadow 120ms ease, color 120ms ease, border-color 120ms ease;
 }
 
 button:hover {
-  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(37, 99, 235, 0.14);
 }
 
 button.secondary {

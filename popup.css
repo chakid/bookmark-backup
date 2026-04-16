@@ -321,14 +321,15 @@ button {
   font: 600 14px/1 "Segoe UI", sans-serif;
   color: var(--accent);
   background: #E8F3FF;
-  transition: background 140ms ease, transform 140ms ease, box-shadow 140ms ease, color 140ms ease, border-color 140ms ease;
+  box-shadow: 0 10px 18px rgba(52, 141, 255, 0);
+  transition: background 140ms ease, box-shadow 140ms ease, color 140ms ease, border-color 140ms ease;
 }
 
 button:hover {
-  transform: translateY(-1px);
   background: #348dff;
   color: white;
   border-color: #348dff;
+  box-shadow: 0 10px 18px rgba(52, 141, 255, 0.14);
 }
 
 button:active {
