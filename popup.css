@@ -309,44 +309,30 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin-top: 24px;
+  margin-top: 32px;
 }
 
 button {
-  border: 0;
-  border-radius: 999px;
-  padding: 13px 16px;
+  border: 1px solid #B3D1FF;
+  border-radius: 10px;
+  padding: 10px 24px;
+  height: 36px;
   cursor: pointer;
   font: 600 14px/1 "Segoe UI", sans-serif;
-  transition: transform 140ms ease, box-shadow 140ms ease, opacity 140ms ease;
+  color: var(--accent);
+  background: #E8F3FF;
+  transition: background 140ms ease, transform 140ms ease, box-shadow 140ms ease, color 140ms ease, border-color 140ms ease;
 }
 
 button:hover {
   transform: translateY(-1px);
-}
-
-button.primary {
+  background: #348dff;
   color: white;
-  background: var(--accent-gradient);
-  box-shadow: 0 16px 24px rgba(22, 119, 255, 0.22);
+  border-color: #348dff;
 }
 
-button.ghost {
-  color: var(--accent);
-  background: var(--surface-soft);
-  border: 1px solid var(--surface-line);
-  box-shadow: var(--surface-shadow);
-  transition: background 140ms ease, color 140ms ease, border-color 140ms ease;
-}
-
-button.ghost:hover {
-  background: #2d88ff;
+button:active {
+  background: #348dff;
   color: white;
-  border-color: #2d88ff;
-}
-
-button.ghost:active {
-  background: #2d88ff;
-  color: white;
-  border-color: #2d88ff;
+  border-color: #348dff;
 }

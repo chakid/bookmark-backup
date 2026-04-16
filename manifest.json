@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Bookmark Backup to Gist",
+  "name": "书签备份",
   "version": "1.0.0",
   "description": "Real-time Chrome bookmark backup with GitHub Gist versioning and conflict detection.",
   "permissions": [

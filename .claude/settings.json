@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"console.log\\('Node available'\\)\")",
+      "Bash(npm install *)"
+    ]
+  }
+}
